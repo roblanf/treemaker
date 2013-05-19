@@ -13,7 +13,7 @@ def exact(unmatched_input_spp, unmatched_aln_spp, matched_spp):
     
     log.info("%d exact matches found" %len(matches))
     log.debug("size of inputs: %d" %(len(unmatched_input_spp)))
-    log.debug(matches)    
+    log.info(matches)    
     log.debug(matched_spp)
     
     return unmatched_input_spp, unmatched_aln_spp, matched_spp
@@ -37,10 +37,10 @@ def choose_maxdata_alnmt_spp(list):
     return best
     
 
-def exact_binomial(unmatched_input_spp, unmatched_aln_spp, matched_spp):
+def exact_binomial(unmatched_input_spp, unmatched_aln_spp, matched_spp, type):
     """ look for exact binomial matches between species in the two lists """
     
-    log.info("Looking for exact binomial matches")
+    log.info("Looking for exact matches between alignment binomial and %s binomial" % type)
     log.debug("size of inputs: %d" %(len(unmatched_input_spp)))
 
     # build a dictionaries keyed by binomials
@@ -52,11 +52,18 @@ def exact_binomial(unmatched_input_spp, unmatched_aln_spp, matched_spp):
 
     input_binomials = {}
     for s in unmatched_input_spp.values():
-        input_binomials[s.original_binomial] = s
+        if type == "original":    
+            input_binomials[s.original_binomial] = s
+        if type == "spellchecked": 
+            input_binomials[s.binomial] = s
+        if type == "original_genbank": 
+            input_binomials[s.original_genbank_binomial] = s
+        if type == "tnrs_genbank": 
+            input_binomials[s.tnrs_genbank_binomial] = s
 
     matches = set(input_binomials) & set(alnmt_binomials)
     log.info("%d binomial matches found" %len(matches))
-    log.debug(matches)    
+    log.info(matches)    
     
     for match in matches:
         input_s = input_binomials[match]
@@ -93,7 +100,7 @@ def spellchecked_binomial(unmatched_input_spp, unmatched_aln_spp, matched_spp):
 
     matches = set(input_binomials) & set(alnmt_binomials)
     log.info("%d spellchecked binomial matches found" %len(matches))
-    log.debug(matches)    
+    log.info(matches)    
     
     for match in matches:
         input_s = input_binomials[match]
