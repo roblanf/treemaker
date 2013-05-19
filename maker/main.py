@@ -1,26 +1,44 @@
-import logging
+import species
+import inputparser
+import tnrs
 import matches
 
-logging.basicConfig(
-    format="%(levelname)-8s | %(asctime)s | %(message)s",
-    level=logging.INFO
-)
+import logging
+
+logging.basicConfig(level="INFO")
+fmt = logging.Formatter("%(levelname)-8s | %(asctime)s | %(name)-10s | %(message)s")
+logging.getLogger("").handlers[0].setFormatter(fmt)
+
+log = logging.getLogger("main")
 
 
-def main(sppfile, alnfile):
+def main(sppfile, alnfile, match_genera=False):
     
-    # this is a list of tuples which will hold our results: (input_name, tree_name)
-    results = []
-
-    # first we get simple lists of species in each input file
-    tree_spp = get_aln_species(alnfile)
-    input_spp = get_input_spp(sppfile)
+    # first we get simple dict of species objects in the input file
+    # each species is built as a species object, named by the actual name
+    unmatched_input_spp = inputparser.get_input_spp(sppfile)
+    log.info("Loaded %d species from input file" %len(unmatched_input_spp))
     
-    # now we look for exact matches. These are easy.
-    # we do this now because we can then reduce the amount of hard work we do later
-    results = get_exact_matches(tree_spp, input_spp)
+    # next we get a dict of spp in stephen smith's alignment, each one has
+    # the amount of data in in the alignment for that spp too
+    unmatched_aln_spp = inputparser.get_aln_spp(alnfile)
     
-    # next we use different services to match possible names
-    tree_dict = get_species_possibilities(tree_sppp, services = 'genbank')
-    input_dict = get_species_possibilities(tree_spp,  services = 'genbank')
+    # a dictionary keyed by input species, with alignment species as values
+    matched_spp = {}
     
+    # 1. Search for exact matches between input spp and smith spp    
+    unmatched_input_spp, unmatched_aln_spp, matched_spp = matches.exact(unmatched_input_spp, unmatched_aln_spp, matched_spp)
+    
+    # 2. Search for exact original binomial matches between input spp and smith spp
+    unmatched_input_spp, unmatched_aln_spp, matched_spp = matches.exact_binomial(unmatched_input_spp, unmatched_aln_spp, matched_spp)
+    
+    # 3. Now we try spelchecking the binomial of each input taxon and see if that helps
+    unmatched_input_spp, unmatched_aln_spp, matched_spp = matches.spellchecked_binomial(unmatched_input_spp, unmatched_aln_spp, matched_spp)
+    
+    # 4. Now we try getting input_binomial -> genbank_spp and see if that helps
+    
+    # 5. Finally we try tnrs_binomial -> genbank_spp and see if that helps
+    
+    # 6. And now we try genus level matching to fill in a few remaining taxa
+    
+    # Finally we print it all out.
