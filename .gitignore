@@ -1,2 +1,8 @@
 
 *.pyc
+
+*.pyc
+
+maker/genbank.pyc
+
+maker/tnrs.pyc
