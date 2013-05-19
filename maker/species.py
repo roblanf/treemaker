@@ -43,6 +43,38 @@ class Species(object):
             checked_binomial = self.set_binomial(self.clean_name)
             self._binomial = checked_binomial
             return self._binomial
+
+    @property
+    def original_genbank_binomial(self):
+        if hasattr(self, '_original_genbank_binomial'):
+            return self._original_genbank_binomial
+        else:
+            original_genbank_binomial = self.get_genbank_binomial(self.original_binomial)
+            self._original_genbank_binomial = original_genbank_binomial
+            return self._original_genbank_binomial
+
+    @property
+    def tnrs_genbank_binomial(self):
+        if hasattr(self, '_tnrs_genbank_binomial'):
+            return self._tnrs_genbank_binomial
+        else:
+            tnrs_genbank_binomial = self.get_genbank_binomial(self.binomial)
+            self._tnrs_genbank_binomial = tnrs_genbank_binomial
+            return self._tnrs_genbank_binomial
+
+    
+    def get_genbank_binomial(self, binomial):
+        taxid = self.get_taxonID(binomial)
+        if taxid != "NA":
+            lineage = genbank.get_lineage(taxid)
+            genbank_binomial = " ".join([lineage['genus'], lineage['species']])
+        else:
+            self.lineage = "NA"
+            genbank_binomial = "NA"
+        
+        log.debug("genbank_binomial is: '%s'" % genbank_binomial)
+        return genbank_binomial
+    
     
     def set_binomial(self, name):
         log.debug("Checking spelling of '%s'" %(name))
@@ -107,7 +139,11 @@ class Species(object):
         
         log.info("set genbank_binomial to: '%s'" %self.genbank_binomial)
         
-             
+         
+    def get_taxonID(self, name):
+        taxid = genbank.get_taxid(name)
+        return taxid
+            
     def set_taxonID(self, name):
 
         taxids = {}
