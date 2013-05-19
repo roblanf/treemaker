@@ -30,12 +30,13 @@ def main(sppfile, alnfile, match_genera=False):
     unmatched_input_spp, unmatched_aln_spp, matched_spp = matches.exact(unmatched_input_spp, unmatched_aln_spp, matched_spp)
     
     # 2. Search for exact original binomial matches between input spp and smith spp
-    unmatched_input_spp, unmatched_aln_spp, matched_spp = matches.exact_binomial(unmatched_input_spp, unmatched_aln_spp, matched_spp)
+    unmatched_input_spp, unmatched_aln_spp, matched_spp = matches.exact_binomial(unmatched_input_spp, unmatched_aln_spp, matched_spp, type="original")
     
     # 3. Now we try spelchecking the binomial of each input taxon and see if that helps
-    unmatched_input_spp, unmatched_aln_spp, matched_spp = matches.spellchecked_binomial(unmatched_input_spp, unmatched_aln_spp, matched_spp)
+    unmatched_input_spp, unmatched_aln_spp, matched_spp = matches.exact_binomial(unmatched_input_spp, unmatched_aln_spp, matched_spp, type="spellchecked")
     
     # 4. Now we try getting input_binomial -> genbank_spp and see if that helps
+    unmatched_input_spp, unmatched_aln_spp, matched_spp = matches.exact_binomial(unmatched_input_spp, unmatched_aln_spp, matched_spp, type="original_genbank")
     
     # 5. Finally we try tnrs_binomial -> genbank_spp and see if that helps
     
