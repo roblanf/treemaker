@@ -1,32 +1,36 @@
 
-
+import species
 import logging
-log = logging.getLogger("parser")
+log = logging.getLogger("input")
 
-def get_aln_species(alnfile):
-    """gets a species list and data count from a phylip alignment
-       returns:
-            * a simple list of species
-            * a dictionary with species names as keys, amount of sequence data as values
-            * a dictionary with genera as keys 
+def get_input_spp(sppfile):
     
-    """
+    spp = open(sppfile, "r").read().splitlines()
+    input_species = {}
     
-    aln = open("/Users/Rob/Dropbox/Current_work/Lasantha/big_plants/big_plants.cn.phy", "r")
+    for s in spp:
+        s_clean = s.replace("_", " ")
+        log.debug("Making species object for '%s'" %(s))
+        input_species[s_clean] = species.Species(s_clean, s)
+        
+    return input_species
+    
+def get_aln_spp(alnfile):
+    log.debug("Opening alignment '%s'" %(alnfile))
+    
+    aln = open(alnfile, "r")
+    sites = int(aln.readline().split()[1])
 
-    header = aln.readline()    
-    spp, sites = header.split()
+    #get a dictionary of names in the smith alignment, keyed by genus
+    aln_spp = {}        
 
-#get a dictionary of names in the smith alignment, keyed by genus
-smith_genera = {}
-smith_data   = {}
+    for line in iter(aln):
+        name = line.split()[0]
+        name_clean = name.replace("_", " ")
+        dna = line.split()[1]
+        data = sites - dna.count("-")
+        s = species.Species(name_clean, name)
+        s.data = data
+        aln_spp[name_clean] = s
 
-for line in iter(smith_aln):
-    species = line.split()[0]
-    genus = species.split("_")[0] 
-    l = smith_genera.setdefault(genus, [])
-    l.append(species)
-    smith_genera[genus] = l
-    dna = line.split()[1]
-    data = 9853 - dna.count("-")
-    smith_data[species] = data
+    return aln_spp
