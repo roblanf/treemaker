@@ -113,7 +113,6 @@ def genus_replacements(unmatched_input_spp, unmatched_aln_spp, matched_spp, type
 
         alnmt_s = choose_best_generic_match(genus, aln_genera)
         if alnmt_s != "NA":
-            print "YAY"
             input_original = input_s.original_name
             unmatched_input_spp.pop(input_s.clean_name)
             alnmt_original = alnmt_s.original_name
