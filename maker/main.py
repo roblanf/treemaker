@@ -3,6 +3,7 @@ import inputparser
 import tnrs
 import matches
 import copy
+import alignment
 
 import logging
 
@@ -13,7 +14,7 @@ logging.getLogger("").handlers[0].setFormatter(fmt)
 log = logging.getLogger("main")
 
 
-def main(sppfile, alnfile, match_genera=False):
+def main(sppfile, alnfile, outgp):
     
     # first we get simple dict of species objects in the input file
     # each species is built as a species object, named by the actual name
@@ -48,6 +49,14 @@ def main(sppfile, alnfile, match_genera=False):
     # 6. And now we try genus level matching to fill in a few remaining taxa
     unmatched_input_spp, unmatched_aln_spp, matched_spp = matches.genus_replacements(unmatched_input_spp, unmatched_aln_spp, matched_spp, type="clean_name")
 
+    log.info("writing alignment including outgroup %s" %outgp)
+
+    alignment_spp = list(matches.values())
+    alignment_spp.append(outgp)
+    
+    alignment.write(alignment_spp, alnfile)
+
+
     # Finally we print it all out.
     log.info("Here are your species matches, including generic level replacements: \n\n")
     for spp in matched_spp:    
@@ -64,4 +73,8 @@ def main(sppfile, alnfile, match_genera=False):
     
     for spp in unmatched_without_replacements.values():
         print spp.original_name, "\t", "NA"
+    
+    
+    
+    
     
