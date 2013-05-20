@@ -51,7 +51,7 @@ def main(sppfile, alnfile, outgp):
 
     log.info("writing alignment including outgroup %s" %outgp)
 
-    alignment_spp = list(matches.values())
+    alignment_spp = list(matched_spp.values())
     alignment_spp.append(outgp)
     
     alignment.write(alignment_spp, alnfile)

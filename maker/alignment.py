@@ -14,7 +14,7 @@ def write(alignment_spp, alnfile):
     header = "%d\t%d\n" %(spp, sites)
 
     outdir = os.path.dirname(alnfile)
-    outfilename = os.path.join(alnfile, "treemaker_alignment.phy")
+    outfilename = os.path.join(outdir, "treemaker_alignment.phy")
 
     outfile = open(outfilename, "w")
     outfile.write(header)
