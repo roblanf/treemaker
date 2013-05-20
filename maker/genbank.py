@@ -24,10 +24,10 @@ def get_taxid(term):
     data = urllib.urlopen(url).read()
     try:
         taxid = re.search('<Id>(\S+)</Id>', data).group(1)
-        log.info("Got TaxonID for '%s': %s" %(term, taxid))
+        log.debug("Got TaxonID for '%s': %s" %(term, taxid))
     except:
         taxid = 'NA'
-        log.info("No TaxonID found for '%s'" %term)
+        log.debug("No TaxonID found for '%s'" %term)
     return taxid
 
 def get_lineage(TaxID):
@@ -60,7 +60,7 @@ def get_lineage(TaxID):
     except:
         taxonomy['species'] = "NA"
 	
-	log.info("Got lineage data for taxID %s" %(TaxID))
+	log.debug("Got lineage data for taxID %s" %(TaxID))
 		
     return taxonomy
 
