@@ -39,7 +39,19 @@ def main(sppfile, alnfile, match_genera=False):
     unmatched_input_spp, unmatched_aln_spp, matched_spp = matches.exact_binomial(unmatched_input_spp, unmatched_aln_spp, matched_spp, type="original_genbank")
     
     # 5. Finally we try tnrs_binomial -> genbank_spp and see if that helps
+    unmatched_input_spp, unmatched_aln_spp, matched_spp = matches.exact_binomial(unmatched_input_spp, unmatched_aln_spp, matched_spp, type="tnrs_genbank")
+    
+    matches_without_replacements = matched_spp
     
     # 6. And now we try genus level matching to fill in a few remaining taxa
-    
+    unmatched_input_spp, unmatched_aln_spp, matched_spp = matches.genus_replacements(unmatched_input_spp, unmatched_aln_spp, matched_spp, type="clean_name")
+
     # Finally we print it all out.
+    for spp in matched_spp:
+    
+        print spp, matched_spp[spp]
+    
+    for spp in unmatched_input_spp.values():
+        
+        print spp.original_name, "NA"
+    
