@@ -51,17 +51,17 @@ def main(sppfile, alnfile, match_genera=False):
     # Finally we print it all out.
     log.info("Here are your species matches, including generic level replacements: \n\n")
     for spp in matched_spp:    
-        print spp, matched_spp[spp]
+        print spp, "\t", matched_spp[spp]
     
     for spp in unmatched_input_spp.values():
-        print spp.original_name, "NA"
+        print spp.original_name, "\t", "NA"
     
     print "\n\n\n"
     
     log.info("Here are your species matches, excluding generic level replacements: \n\n")
     for spp in matches_without_replacements:    
-        print spp, matched_spp[spp]
+        print spp,"\t", matched_spp[spp]
     
     for spp in unmatched_without_replacements.values():
-        print spp.original_name, "NA"
+        print spp.original_name, "\t", "NA"
     
