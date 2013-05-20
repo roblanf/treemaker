@@ -80,43 +80,54 @@ def exact_binomial(unmatched_input_spp, unmatched_aln_spp, matched_spp, type):
     
     return unmatched_input_spp, unmatched_aln_spp, matched_spp
      
-  
-def spellchecked_binomial(unmatched_input_spp, unmatched_aln_spp, matched_spp):
-    """ look for exact binomial matches between species in the two lists """
+def choose_best_generic_match(genus, aln_genera):
     
-    log.info("Looking for matches when translating inputs to tnrs accepted binomials")
-    log.debug("size of inputs: %d" %(len(unmatched_input_spp)))
-
-    # build a dictionaries keyed by binomials
-    alnmt_binomials = {}
+    log.info("Looking for genus '%s' in alignment"  % genus)
+    
+    try:
+        alnmt_s = choose_maxdata_alnmt_spp(aln_genera[genus])        
+        log.info("Best match is '%s'" % alnmt_s.clean_name)
+    except:
+        alnmt_s = "NA"
+    
+    return alnmt_s
+    
+ 
+def genus_replacements(unmatched_input_spp, unmatched_aln_spp, matched_spp, type):
+    aln_genera = {}
+    matches = {}
+    # we make a dictionary keyed by genera
     for s in unmatched_aln_spp.values():
-        l = alnmt_binomials.setdefault(s.original_binomial, [])
+        genus = s.clean_name.split()[0]
+        l = aln_genera.setdefault(genus, [])
         l.append(s)
-        alnmt_binomials[s.original_binomial] = l
+        aln_genera[genus] = l
+    
+    # now we just loop through the unmatched input species and pop generic matches
+    for input_s in unmatched_input_spp.values():
+        if type == "clean_name" and input_s.clean_name != "NA" and len(input_s.clean_name.split())>1:
+            genus = input_s.clean_name.split()[0]
+        
+        else:
+            genus = "NA"        
 
-    input_binomials = {}
-    for s in unmatched_input_spp.values():
-        input_binomials[s.binomial] = s
-
-    matches = set(input_binomials) & set(alnmt_binomials)
-    log.info("%d spellchecked binomial matches found" %len(matches))
+        alnmt_s = choose_best_generic_match(genus, aln_genera)
+        if alnmt_s != "NA":
+            print "YAY"
+            input_original = input_s.original_name
+            unmatched_input_spp.pop(input_s.clean_name)
+            alnmt_original = alnmt_s.original_name
+            unmatched_aln_spp.pop(alnmt_s.clean_name)
+            matched_spp[input_original] = alnmt_original
+            matches[input_original] = alnmt_original
+            
+            l = aln_genera[genus]
+            i = l.index(alnmt_s)
+            removed = l.pop(i)
+            aln_genera[genus] = l
+            
+    log.info("%d genus level replacements found" %len(matches))
     log.info(matches)    
     
-    for match in matches:
-        input_s = input_binomials[match]
-        input_original = input_s.original_name
-        unmatched_input_spp.pop(input_s.clean_name)
-        
-        alnmt_s = choose_maxdata_alnmt_spp(alnmt_binomials[match])        
-        alnmt_original = alnmt_s.original_name
-        unmatched_aln_spp.pop(alnmt_s.clean_name)
-        matched_spp[input_original] = alnmt_original
-
-    log.debug("size of inputs: %d" %(len(unmatched_input_spp)))
-    log.debug(matched_spp)
-    
     return unmatched_input_spp, unmatched_aln_spp, matched_spp
-  
-  
-  
     
