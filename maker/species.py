@@ -51,6 +51,9 @@ class Species(object):
         else:
             original_genbank_binomial = self.get_genbank_binomial(self.original_binomial)
             self._original_genbank_binomial = original_genbank_binomial
+            if original_genbank_binomial != self.original_binomial and original_genbank_binomial != "NA":
+                log.info("Original binomial          : '%s'" % self.original_binomial)
+                log.info("Original Genbank binomial  : '%s'" % original_genbank_binomial)
             return self._original_genbank_binomial
 
     @property
@@ -60,6 +63,9 @@ class Species(object):
         else:
             tnrs_genbank_binomial = self.get_genbank_binomial(self.binomial)
             self._tnrs_genbank_binomial = tnrs_genbank_binomial
+            if tnrs_genbank_binomial != self.original_binomial and tnrs_genbank_binomial != "NA":
+                log.info("Original binomial      : '%s'" % self.original_binomial)
+                log.info("TNRS Genbank binomial  : '%s'" % tnrs_genbank_binomial)
             return self._tnrs_genbank_binomial
 
     
@@ -69,7 +75,7 @@ class Species(object):
             lineage = genbank.get_lineage(taxid)
             genbank_binomial = " ".join([lineage['genus'], lineage['species']])
         else:
-            self.lineage = "NA"
+            lineage = "NA"
             genbank_binomial = "NA"
         
         log.debug("genbank_binomial is: '%s'" % genbank_binomial)
@@ -96,8 +102,6 @@ class Species(object):
             log.debug("Binomial matches TNRS")
 
         elif binomial != self.tnrs_binomial and self.tnrs_binomial != "NA" and len(self.tnrs_binomial.split())>1:
-            log.warning("Spelling error detected. Binomial '%s' doesn't match TNRS "
-                            "'%s'" %(binomial, self.tnrs_binomial))
             checked_binomial = self.tnrs_binomial
             self.TNRSmatch = "imperfect"
 
@@ -118,12 +122,14 @@ class Species(object):
                 checked_binomial = ' '.join([tnrs_genus, species])
                 self.TNRSmatch = "genus_imperfect"
             else:
-                log.warning("No genus match found for '%s', please check" % genus)
+                log.warning("No genus match found on TNRS for '%s', please check" % genus)
                 self.TNRSmatch = "none"
                 checked_binomial = binomial
-
-        log.info("Original binomial is    : '%s'" %(self.original_binomial))                
-        log.info("Spellchecked binomial is: '%s'" %(checked_binomial))
+        
+        if self.original_binomial != checked_binomial:
+            log.warning("Spelling error detected")
+            log.info("Original binomial     : '%s'" %(self.original_binomial))                
+            log.info("Spellchecked binomial : '%s'" %(checked_binomial))
         
         return checked_binomial           
         
